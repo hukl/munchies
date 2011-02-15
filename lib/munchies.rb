@@ -3,14 +3,16 @@ require 'stringio'
 module Munchies
   class Logfile
 
+    include Enumerable
+
     # Matches timestamps in logfile
     TIME_REGEXP = /^\d{4}-\d{2}-\d{2}T\d{2}\:\d{2}\:\d{2}\b/
 
-    def initialize path, starting_at = nil
+    def initialize path, starting_at = Time.now
       raise ArgumentError unless File.exists?( path )
 
       @log            = File.open( path )
-      @ending_at      = starting_at.nil? ? Time.now : Time.parse( starting_at )
+      @ending_at      = starting_at
       @starting_at    = (@ending_at - 300)
     end
 
@@ -56,7 +58,7 @@ module Munchies
 
     end
 
-    def emit &block
+    def each &block
       backwards
 
       @log.each_line do |line|
